@@ -17,7 +17,7 @@ export const HERO_SLIDES = [
     description: "Marvel at the 'Niagara of India' as majestic white cascades plummet through dense tropical rainforests with thunderous harmony.",
     image: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=2000&q=85",
     location: "Chalakudy River Basin",
-    height: "80 Feet"
+    temp: "24°C"
   },
   {
     id: "backwater",
@@ -27,7 +27,7 @@ export const HERO_SLIDES = [
     description: "Glide silently aboard a handcrafted Kettuvallam through palm-fringed lagoons, quiet villages, and golden reflection waters.",
     image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=2000&q=85",
     location: "Vembanad Lake, Alleppey",
-    vibe: "Tranquil Luxury"
+    temp: "27°C"
   },
   {
     id: "beaches",
@@ -37,19 +37,27 @@ export const HERO_SLIDES = [
     description: "Bask in warm coastal sunsets over dramatic red cliffs, swaying coconut groves, and pristine azure surf along the coast.",
     image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=2000&q=85",
     location: "Varkala Cliff Beach",
-    sunset: "6:15 PM"
+    temp: "29°C"
   }
 ];
 
 export const FEATURED_EVENT = {
   title: "Malabar River Festival 2026",
   subtitle: "Asia's Premier Whitewater Kayaking Championship",
-  description: "Witness world-class kayakers battle the roaring rapids of Kuttiyadi and Chalipuzha rivers amidst lush monsoon rainforests.",
+  description: "Witness world-class kayakers battle the roaring rapids of Kuttiyadi and Chalipuzha rivers amidst lush monsoon rainforests. Featuring international athletes, cultural concerts, and eco-adventures.",
   date: "July 24 – 28, 2026",
   location: "Kozhikode & Wayanad, Kerala",
   image: "https://images.unsplash.com/photo-1530866495561-507c9faab2ed?auto=format&fit=crop&w=2000&q=85",
   badge: "International Sports Fest"
 };
+
+export const DESTINATION_CATEGORIES = [
+  "All",
+  "Highlands",
+  "Backwaters",
+  "Wilderness",
+  "Coastline"
+];
 
 export const POPULAR_DESTINATIONS = [
   {
@@ -66,7 +74,7 @@ export const POPULAR_DESTINATIONS = [
     id: 2,
     name: "Alleppey Backwaters",
     district: "Alappuzha",
-    category: "Lagoon Cruise",
+    category: "Backwaters",
     rating: "4.95",
     reviews: "3.8k",
     image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80",
@@ -91,6 +99,26 @@ export const POPULAR_DESTINATIONS = [
     reviews: "2.1k",
     image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
     description: "Dramatic red laterite cliffs overlooking the Arabian Sea with natural mineral springs."
+  },
+  {
+    id: 5,
+    name: "Thekkady Spice Valley",
+    district: "Idukki",
+    category: "Wilderness",
+    rating: "4.88",
+    reviews: "1.7k",
+    image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=80",
+    description: "Aromatic cardamom hills, Periyar bamboo rafting, and wild tiger reserve boat tours."
+  },
+  {
+    id: 6,
+    name: "Kumarakom Bird Sanctuary",
+    district: "Kottayam",
+    category: "Backwaters",
+    rating: "4.92",
+    reviews: "2.8k",
+    image: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80",
+    description: "Vembanad wetland paradise hosting migratory Siberian storks, lotus blooms, and coir crafts."
   }
 ];
 
@@ -155,3 +183,64 @@ export const STUNNING_WONDERS = [
     description: "Restorative herbal oil massages (Abhyangam & Shirodhara) guided by certified Ayurvedic doctors."
   }
 ];
+
+export const SEASON_GUIDE = [
+  {
+    id: "monsoon",
+    season: "Monsoon Bliss",
+    months: "June – September",
+    temp: "22°C - 28°C",
+    tagline: "Ayurveda & Lush Rain Magic",
+    description: "The rain transforms Kerala into a glowing green wonderland. The air is cool, rivers roar, and Ayurvedic treatments reach peak efficacy.",
+    activities: ["Ayurvedic Wellness Retreats", "Cascading Waterfall Safaris", "Monsoon Kayaking & Rafting"],
+    image: "https://images.unsplash.com/photo-1530866495561-507c9faab2ed?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    id: "winter",
+    season: "Winter Solitude",
+    months: "October – February",
+    temp: "17°C - 26°C",
+    tagline: "Pleasant Hilltops & Houseboats",
+    description: "The most comfortable climate with crisp morning mist in Munnar and gentle golden sunshine across the backwaters.",
+    activities: ["Highland Tea Estate Treks", "Overnight Houseboat Cruises", "Theyyam Ritual Performances"],
+    image: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    id: "summer",
+    season: "Coastal Summer",
+    months: "March – May",
+    temp: "25°C - 33°C",
+    tagline: "Golden Beaches & Temple Fests",
+    description: "Ideal for beach lovers, cliff-side sunsets, ocean surfing, and grand temple festivals featuring caparisoned elephants.",
+    activities: ["Varkala Cliff Paragliding", "Thrissur Pooram Temple Fest", "Spice Plantation Tours"],
+    image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1000&q=80"
+  }
+];
+
+export const TRAVELER_REVIEWS = [
+  {
+    id: 1,
+    name: "Elena Rostova",
+    location: "Zurich, Switzerland",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+    rating: 5,
+    comment: "Floating through the Alleppey backwaters at sunset felt like living inside a surreal painting. Unforgettable hospitality!"
+  },
+  {
+    id: 2,
+    name: "Marcus Vance",
+    location: "London, UK",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+    rating: 5,
+    comment: "The morning mist in Munnar tea hills accompanied by fresh cardamom chai is something every traveler must experience."
+  },
+  {
+    id: 3,
+    name: "Aria Thorne",
+    location: "Sydney, Australia",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80",
+    rating: 5,
+    comment: "The Ayurvedic rejuvenation package in Thekkady restored my energy completely. Truly God's Own Country!"
+  }
+];
+
