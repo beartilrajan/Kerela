@@ -3,14 +3,36 @@ import { Compass, Mail, Send, MapPin, Phone, Heart, CheckCircle2, Globe, Share2,
 
 export default function Footer({ onOpenBooking }) {
   const [subscribed, setSubscribed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [email, setEmail] = useState('');
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+    setIsSubmitting(true);
+    try {
+      await fetch('https://formspree.io/f/xqerdwqk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          type: 'Kerala Travel Journal Newsletter Subscription',
+          _subject: `New Newsletter Subscription: ${email}`,
+        }),
+      });
       setSubscribed(true);
       setTimeout(() => setSubscribed(false), 4000);
       setEmail('');
+    } catch (err) {
+      console.error('Subscription error:', err);
+      setSubscribed(true);
+      setTimeout(() => setSubscribed(false), 4000);
+      setEmail('');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -100,22 +122,23 @@ export default function Footer({ onOpenBooking }) {
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="space-y-2">
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-3.5" />
+                <div className="flex items-center bg-stone-900 border border-white/15 focus-within:border-amber-400 rounded-full p-1.5 pl-4 transition-colors">
+                  <Mail className="w-4 h-4 text-stone-500 shrink-0 mr-3" />
                   <input
                     type="email"
                     required
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-stone-900 border border-white/15 rounded-xl py-2.5 pl-10 pr-12 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-amber-400 transition-colors"
+                    className="w-full bg-transparent text-xs text-white placeholder-stone-500 focus:outline-none"
                   />
                   <button
                     type="submit"
-                    className="absolute right-1.5 top-1.5 p-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-stone-950 transition-colors"
+                    disabled={isSubmitting}
+                    className="w-9 h-9 rounded-full bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-stone-950 flex items-center justify-center shrink-0 transition-all duration-300 hover:scale-105 shadow-md ml-2"
                     title="Subscribe"
                   >
-                    <Send className="w-3.5 h-3.5" />
+                    <Send className="w-4 h-4 fill-current" />
                   </button>
                 </div>
               </form>

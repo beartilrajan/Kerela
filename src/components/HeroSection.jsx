@@ -7,17 +7,60 @@ export default function HeroSection({ onOpenBooking }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [parallaxY, setParallaxY] = useState(0);
 
   const heroRef = useRef(null);
   const glassBoxRef = useRef(null);
   const titleRef = useRef(null);
   const descRef = useRef(null);
   const badgeRef = useRef(null);
+  const audioRef = useRef(null);
+  const pillsBarRef = useRef(null);
+  const prevBtnRef = useRef(null);
+  const nextBtnRef = useRef(null);
 
   const activeSlide = HERO_SLIDES[currentIndex];
   const DURATION = 7000; // 7 seconds per slide
+
+  // Scroll Parallax Effect for Background Image
+  useEffect(() => {
+    const handleScroll = () => {
+      setParallaxY(window.scrollY * 0.3);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Audio playback handler for Kerala theme music (on by default with interaction fallback)
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    if (!isMuted) {
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // If browser restricts unmuted autoplay, trigger playback on first user gesture
+          const startOnInteraction = () => {
+            if (audioRef.current && !isMuted) {
+              audioRef.current.play();
+            }
+            window.removeEventListener('click', startOnInteraction);
+            window.removeEventListener('touchstart', startOnInteraction);
+            window.removeEventListener('scroll', startOnInteraction);
+            window.removeEventListener('keydown', startOnInteraction);
+          };
+          window.addEventListener('click', startOnInteraction);
+          window.addEventListener('touchstart', startOnInteraction);
+          window.addEventListener('scroll', startOnInteraction);
+          window.addEventListener('keydown', startOnInteraction);
+        });
+      }
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isMuted]);
 
   // Handle slide change with dual layer tracking for smooth crossfade
   const changeSlide = (newIndex) => {
@@ -28,29 +71,47 @@ export default function HeroSection({ onOpenBooking }) {
   };
 
   const handleNext = () => {
+    if (nextBtnRef.current) {
+      gsap.fromTo(nextBtnRef.current, { x: 0 }, { x: 5, duration: 0.15, yoyo: true, repeat: 1, ease: 'power1.out' });
+    }
     changeSlide((currentIndex + 1) % HERO_SLIDES.length);
   };
 
   const handlePrev = () => {
+    if (prevBtnRef.current) {
+      gsap.fromTo(prevBtnRef.current, { x: 0 }, { x: -5, duration: 0.15, yoyo: true, repeat: 1, ease: 'power1.out' });
+    }
     changeSlide((currentIndex - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
   };
 
   // GSAP Entrance & Text Reveal Animation on Slide Switch
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Text & Badge stagger reveal
+      // Text & Badge stagger reveal - crisp timing
       gsap.fromTo(
         [badgeRef.current, titleRef.current, descRef.current],
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power3.out' }
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
       );
 
       // Glass box floating pop
       gsap.fromTo(
         glassBoxRef.current,
-        { scale: 0.96, opacity: 0.8 },
-        { scale: 1, opacity: 1, duration: 0.8, ease: 'power2.out' }
+        { scale: 0.97, opacity: 0.85 },
+        { scale: 1, opacity: 1, duration: 0.45, ease: 'power2.out' }
       );
+
+      // Slide Switcher Pills entrance & active pill pop
+      if (pillsBarRef.current) {
+        const activePill = pillsBarRef.current.children[currentIndex];
+        if (activePill) {
+          gsap.fromTo(
+            activePill,
+            { scale: 0.92 },
+            { scale: 1.06, duration: 0.35, ease: 'back.out(2)' }
+          );
+        }
+      }
     }, heroRef);
 
     return () => ctx.revert();
@@ -107,8 +168,11 @@ export default function HeroSection({ onOpenBooking }) {
       ref={heroRef}
       className="relative min-h-screen w-full overflow-hidden flex flex-col justify-between pt-24 pb-8 md:pb-12 px-4 sm:px-8 md:px-16 text-white select-none fix-corner-glitch"
     >
-      {/* Dual Layer Crossfade Background Images for Ultra-Smooth Transitions */}
-      <div className="absolute inset-0 z-0 bg-stone-950">
+      {/* Dual Layer Crossfade Background Images with Scroll Parallax */}
+      <div
+        className="absolute inset-0 z-0 bg-stone-950 will-change-transform"
+        style={{ transform: `translateY(${parallaxY}px)` }}
+      >
         {HERO_SLIDES.map((slide, idx) => (
           <div
             key={slide.id}
@@ -195,7 +259,7 @@ export default function HeroSection({ onOpenBooking }) {
             ref={glassBoxRef}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            className="glass-box p-6 sm:p-8 rounded-3xl max-w-lg w-full space-y-5 shadow-2xl relative border border-white/20 fix-corner-glitch transition-all duration-300"
+            className="bg-[#141414]/75 backdrop-blur-md p-6 sm:p-8 rounded-3xl max-w-lg w-full space-y-5 shadow-2xl relative border border-white/20 fix-corner-glitch transition-all duration-300"
           >
             {/* Ambient Shimmer */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
@@ -237,34 +301,28 @@ export default function HeroSection({ onOpenBooking }) {
         </div>
       </div>
 
-      {/* Bottom Controls Bar & Autoplay Progress Bar */}
-      <div className="relative z-20 max-w-7xl w-full mx-auto pt-6 border-t border-white/15 flex flex-col md:flex-row items-center justify-between gap-6">
-        {/* Progress Line */}
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/10">
-          <div
-            className="h-full bg-gradient-to-r from-amber-400 to-amber-200 transition-all duration-100 ease-linear rounded-full"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+      {/* Bottom Controls Bar */}
+      <div className="relative z-20 max-w-7xl w-full mx-auto pt-6 flex flex-col md:flex-row items-center justify-between gap-6">
 
         {/* Horizontal Slide Switcher Pills */}
         <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar w-full md:w-auto">
           <button
+            ref={prevBtnRef}
             onClick={handlePrev}
-            className="p-2.5 rounded-full bg-stone-900/60 hover:bg-amber-400 hover:text-stone-950 text-stone-300 border border-white/10 transition-colors shadow-md"
+            className="p-2.5 rounded-full bg-stone-900/60 hover:bg-amber-400 text-stone-300 border border-white/10 transition-colors shadow-md group"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5 group-hover:text-stone-950 transition-colors" />
           </button>
 
-          <div className="flex items-center gap-3 sm:gap-6 px-2">
+          <div ref={pillsBarRef} className="flex items-center gap-3 sm:gap-6 px-2">
             {HERO_SLIDES.map((slide, idx) => (
               <button
                 key={slide.id}
                 onClick={() => changeSlide(idx)}
-                className={`text-sm sm:text-base font-serif tracking-wider transition-all duration-300 relative py-1 px-3 rounded-full ${
+                className={`text-sm sm:text-base font-serif tracking-wider transition-all duration-300 relative py-1.5 px-4 rounded-full ${
                   currentIndex === idx
-                    ? 'text-amber-300 font-bold bg-amber-500/20 border border-amber-400/40 shadow-lg scale-105'
+                    ? 'text-amber-300 font-bold bg-amber-500/20 border border-amber-400/40 shadow-lg shadow-amber-400/10'
                     : 'text-stone-400 hover:text-white font-normal hover:bg-white/5'
                 }`}
               >
@@ -274,11 +332,12 @@ export default function HeroSection({ onOpenBooking }) {
           </div>
 
           <button
+            ref={nextBtnRef}
             onClick={handleNext}
-            className="p-2.5 rounded-full bg-stone-900/60 hover:bg-amber-400 hover:text-stone-950 text-stone-300 border border-white/10 transition-colors shadow-md"
+            className="p-2.5 rounded-full bg-stone-900/60 hover:bg-amber-400 text-stone-300 border border-white/10 transition-colors shadow-md group"
             aria-label="Next slide"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5 group-hover:text-stone-950 transition-colors" />
           </button>
         </div>
 
@@ -287,24 +346,27 @@ export default function HeroSection({ onOpenBooking }) {
           {/* Play/Pause Button */}
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="w-10 h-10 rounded-full bg-stone-900/70 hover:bg-amber-400 hover:text-stone-950 border border-white/20 flex items-center justify-center text-white transition-all duration-300 shadow-xl"
+            className="w-10 h-10 rounded-full bg-stone-900/70 hover:bg-amber-400 border border-white/20 flex items-center justify-center text-white transition-all duration-300 shadow-xl group"
             title={isPlaying ? 'Pause Autoplay' : 'Play Autoplay'}
             aria-label={isPlaying ? 'Pause Autoplay' : 'Play Autoplay'}
           >
-            {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
+            {isPlaying ? <Pause className="w-4 h-4 fill-current group-hover:text-stone-950" /> : <Play className="w-4 h-4 fill-current ml-0.5 group-hover:text-stone-950" />}
           </button>
 
           {/* Mute/Unmute Button */}
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className="w-10 h-10 rounded-full bg-stone-900/70 hover:bg-amber-400 hover:text-stone-950 border border-white/20 flex items-center justify-center text-white transition-all duration-300 shadow-xl"
+            className="w-10 h-10 rounded-full bg-stone-900/70 hover:bg-amber-400 border border-white/20 flex items-center justify-center text-white transition-all duration-300 shadow-xl group"
             title={isMuted ? 'Unmute Ambient Sound' : 'Mute Ambient Sound'}
             aria-label={isMuted ? 'Unmute Ambient Sound' : 'Mute Ambient Sound'}
           >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-amber-400 animate-bounce" />}
+            {isMuted ? <VolumeX className="w-4 h-4 group-hover:text-stone-950" /> : <Volume2 className="w-4 h-4 text-amber-400 group-hover:text-stone-950 animate-bounce" />}
           </button>
         </div>
       </div>
+
+      {/* Ambient Audio Stream */}
+      <audio ref={audioRef} src="/kerala_theme.mp3" loop />
     </section>
   );
 }

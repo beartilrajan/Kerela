@@ -16,16 +16,16 @@ export default function WondersSection({ onSelectWonder }) {
         const cards = gridRef.current.children;
         gsap.fromTo(
           cards,
-          { y: 60, opacity: 0 },
+          { y: 35, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 1.1,
-            stagger: 0.18,
-            ease: 'power3.out',
+            duration: 0.55,
+            stagger: 0.08,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: gridRef.current,
-              start: 'top 80%',
+              start: 'top 88%',
             },
           }
         );

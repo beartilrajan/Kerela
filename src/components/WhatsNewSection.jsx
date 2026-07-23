@@ -13,10 +13,10 @@ export default function WhatsNewSection({ onOpenBooking }) {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Parallax image scale animation on scroll
+      // Parallax image scale animation on scroll - instant smooth response
       gsap.fromTo(
         cardImageRef.current,
-        { scale: 1.15 },
+        { scale: 1.12 },
         {
           scale: 1.0,
           ease: 'none',
@@ -24,7 +24,7 @@ export default function WhatsNewSection({ onOpenBooking }) {
             trigger: sectionRef.current,
             start: 'top bottom',
             end: 'bottom top',
-            scrub: 1.2,
+            scrub: 0.4,
           },
         }
       );
@@ -32,15 +32,15 @@ export default function WhatsNewSection({ onOpenBooking }) {
       // Content entrance animation
       gsap.fromTo(
         contentRef.current,
-        { y: 50, opacity: 0 },
+        { y: 35, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 1,
-          ease: 'power3.out',
+          duration: 0.6,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 75%',
+            start: 'top 88%',
           },
         }
       );

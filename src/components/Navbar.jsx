@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Compass, Menu, X, ChevronRight, Phone } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { Compass, ChevronRight } from 'lucide-react';
 
 export default function Navbar({ onOpenBooking }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDrawerMounted, setIsDrawerMounted] = useState(false);
+
+  const drawerRef = useRef(null);
+  const linksContainerRef = useRef(null);
+  const actionBtnRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -12,6 +18,93 @@ export default function Navbar({ onOpenBooking }) {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // GSAP animation flow for both opening AND closing mobile drawer
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      setIsDrawerMounted(true);
+    } else if (isDrawerMounted && drawerRef.current) {
+      // GSAP Exit Animation when closing menu
+      const ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          onComplete: () => setIsDrawerMounted(false),
+        });
+
+        // Animate button fade & scale down cleanly in place
+        if (actionBtnRef.current) {
+          tl.to(actionBtnRef.current, {
+            opacity: 0,
+            scale: 0.96,
+            y: 5,
+            duration: 0.15,
+            ease: 'power2.in',
+          });
+        }
+
+        // Animate links fade out
+        if (linksContainerRef.current) {
+          const links = Array.from(linksContainerRef.current.children).filter((el) => el.tagName === 'A');
+          tl.to(
+            links,
+            {
+              opacity: 0,
+              x: -10,
+              duration: 0.15,
+              stagger: 0.02,
+              ease: 'power2.in',
+            },
+            '-=0.1'
+          );
+        }
+
+        // Drawer container fade & slide up
+        tl.to(
+          drawerRef.current,
+          {
+            opacity: 0,
+            y: -12,
+            duration: 0.2,
+            ease: 'power2.in',
+          },
+          '-=0.1'
+        );
+      }, drawerRef);
+
+      return () => ctx.revert();
+    }
+  }, [mobileMenuOpen]);
+
+  // GSAP Entrance Animation when drawer mounts
+  useEffect(() => {
+    if (mobileMenuOpen && isDrawerMounted && drawerRef.current) {
+      const ctx = gsap.context(() => {
+        gsap.fromTo(
+          drawerRef.current,
+          { opacity: 0, y: -12 },
+          { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+        );
+
+        if (linksContainerRef.current) {
+          const links = Array.from(linksContainerRef.current.children).filter((el) => el.tagName === 'A');
+          gsap.fromTo(
+            links,
+            { opacity: 0, x: -15 },
+            { opacity: 1, x: 0, duration: 0.28, stagger: 0.04, ease: 'power2.out' }
+          );
+        }
+
+        if (actionBtnRef.current) {
+          gsap.fromTo(
+            actionBtnRef.current,
+            { opacity: 0, scale: 0.96, y: 8 },
+            { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: 'back.out(1.5)', delay: 0.15 }
+          );
+        }
+      }, drawerRef);
+
+      return () => ctx.revert();
+    }
+  }, [isDrawerMounted, mobileMenuOpen]);
 
   const navLinks = [
     { name: 'Destinations', href: '#popular' },
@@ -26,7 +119,7 @@ export default function Navbar({ onOpenBooking }) {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? 'bg-stone-950/90 backdrop-blur-xl py-3.5 shadow-2xl border-b border-white/10'
+          ? 'bg-stone-950/90 backdrop-blur-xl py-3.5 shadow-2xl'
           : 'bg-gradient-to-b from-stone-950/80 via-stone-950/30 to-transparent py-5'
       }`}
     >
@@ -47,15 +140,15 @@ export default function Navbar({ onOpenBooking }) {
         </a>
 
         {/* Desktop Nav Links */}
-        <nav className="hidden lg:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-8 xl:gap-9">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-stone-300 hover:text-amber-400 text-xs uppercase tracking-widest font-semibold transition-colors duration-200 relative group py-1"
+              className="text-stone-300 hover:text-amber-400 text-xs uppercase tracking-widest font-semibold transition-colors duration-200 relative group py-2.5 px-1.5 focus:outline-none"
             >
               {link.name}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
+              <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
             </a>
           ))}
         </nav>
@@ -71,36 +164,55 @@ export default function Navbar({ onOpenBooking }) {
           </button>
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Morphing Hamburger Menu Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2 rounded-lg text-white hover:text-amber-400 hover:bg-white/10 transition-colors"
+          className="lg:hidden relative w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white flex flex-col items-center justify-center gap-1.5 transition-all duration-300 focus:outline-none"
           aria-label="Toggle Navigation Menu"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          <span
+            className={`w-5 h-0.5 bg-amber-400 rounded-full transition-all duration-300 transform origin-center ${
+              mobileMenuOpen ? 'rotate-45 translate-y-2' : ''
+            }`}
+          />
+          <span
+            className={`w-5 h-0.5 bg-amber-400 rounded-full transition-all duration-300 ${
+              mobileMenuOpen ? 'opacity-0 scale-0' : 'opacity-100'
+            }`}
+          />
+          <span
+            className={`w-5 h-0.5 bg-amber-400 rounded-full transition-all duration-300 transform origin-center ${
+              mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
+            }`}
+          />
         </button>
       </div>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-stone-950/95 backdrop-blur-2xl border-b border-white/10 px-6 py-6 transition-all animate-fadeIn">
-          <div className="flex flex-col gap-4">
+      {/* Mobile Drawer with GSAP Staggered Entrance & Exit Animations */}
+      {isDrawerMounted && (
+        <div
+          ref={drawerRef}
+          className="lg:hidden bg-stone-950/95 backdrop-blur-2xl border-b border-white/10 px-6 py-6 transition-all"
+        >
+          <div ref={linksContainerRef} className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-stone-200 hover:text-amber-400 text-base font-serif tracking-wide py-2 border-b border-white/5"
+                className="text-stone-200 hover:text-amber-400 text-lg font-serif tracking-wide py-2 border-b border-white/5 flex items-center justify-between group transition-colors"
               >
-                {link.name}
+                <span>{link.name}</span>
+                <ChevronRight className="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
               </a>
             ))}
             <button
+              ref={actionBtnRef}
               onClick={() => {
                 setMobileMenuOpen(false);
                 onOpenBooking();
               }}
-              className="mt-2 text-center py-3 rounded-full bg-amber-400 text-stone-950 font-bold text-xs uppercase tracking-wider shadow-lg"
+              className="mt-2 text-center py-3.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-400/20 transition-all hover:scale-[1.02]"
             >
               Plan Your Journey
             </button>

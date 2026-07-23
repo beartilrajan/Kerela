@@ -15,16 +15,16 @@ export default function TravelersSection() {
       if (cardsRef.current) {
         gsap.fromTo(
           cardsRef.current.children,
-          { y: 50, opacity: 0 },
+          { y: 35, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.9,
-            stagger: 0.15,
-            ease: 'power3.out',
+            duration: 0.55,
+            stagger: 0.08,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: cardsRef.current,
-              start: 'top 82%',
+              start: 'top 88%',
             },
           }
         );

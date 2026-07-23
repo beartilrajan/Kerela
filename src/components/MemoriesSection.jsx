@@ -16,15 +16,15 @@ export default function MemoriesSection({ onSelectExperience }) {
       // Left column reveal
       gsap.fromTo(
         leftColRef.current,
-        { x: -50, opacity: 0 },
+        { x: -30, opacity: 0 },
         {
           x: 0,
           opacity: 1,
-          duration: 1.1,
-          ease: 'power3.out',
+          duration: 0.55,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 75%',
+            start: 'top 88%',
           },
         }
       );
@@ -34,17 +34,17 @@ export default function MemoriesSection({ onSelectExperience }) {
         const cards = carouselRef.current.children;
         gsap.fromTo(
           cards,
-          { x: 80, opacity: 0, scale: 0.95 },
+          { x: 40, opacity: 0, scale: 0.97 },
           {
             x: 0,
             opacity: 1,
             scale: 1,
-            duration: 0.9,
-            stagger: 0.15,
-            ease: 'power3.out',
+            duration: 0.55,
+            stagger: 0.08,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: carouselRef.current,
-              start: 'top 80%',
+              start: 'top 88%',
             },
           }
         );
@@ -104,18 +104,18 @@ export default function MemoriesSection({ onSelectExperience }) {
               {/* Circular Dark Buttons with Gold Chevrons */}
               <button
                 onClick={scrollLeft}
-                className="w-12 h-12 rounded-full bg-stone-900/80 hover:bg-amber-400 text-stone-300 hover:text-stone-950 border border-white/20 flex items-center justify-center transition-all duration-300 shadow-xl hover:scale-110"
+                className="w-12 h-12 rounded-full bg-stone-900/80 hover:bg-amber-400 text-stone-300 border border-white/20 flex items-center justify-center transition-all duration-300 shadow-xl hover:scale-110 group"
                 aria-label="Scroll Carousel Left"
               >
-                <ChevronLeft className="w-6 h-6 text-amber-400 hover:text-stone-950" />
+                <ChevronLeft className="w-6 h-6 text-amber-400 group-hover:text-stone-950 transition-colors" />
               </button>
 
               <button
                 onClick={scrollRight}
-                className="w-12 h-12 rounded-full bg-stone-900/80 hover:bg-amber-400 text-stone-300 hover:text-stone-950 border border-white/20 flex items-center justify-center transition-all duration-300 shadow-xl hover:scale-110"
+                className="w-12 h-12 rounded-full bg-stone-900/80 hover:bg-amber-400 text-stone-300 border border-white/20 flex items-center justify-center transition-all duration-300 shadow-xl hover:scale-110 group"
                 aria-label="Scroll Carousel Right"
               >
-                <ChevronRight className="w-6 h-6 text-amber-400 hover:text-stone-950" />
+                <ChevronRight className="w-6 h-6 text-amber-400 group-hover:text-stone-950 transition-colors" />
               </button>
             </div>
           </div>

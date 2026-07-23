@@ -15,27 +15,48 @@ export default function PopularSection({ onSelectDestination }) {
     ? POPULAR_DESTINATIONS
     : POPULAR_DESTINATIONS.filter((d) => d.category === activeCategory);
 
-  // GSAP ScrollTrigger Entrance Animation
+  const isInitialMount = useRef(true);
+
+  // GSAP ScrollTrigger & Tab Filter Animation
   useEffect(() => {
     const ctx = gsap.context(() => {
       if (gridRef.current) {
         const cards = gridRef.current.children;
-        gsap.fromTo(
-          cards,
-          { y: 60, opacity: 0, scale: 0.95 },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.8,
-            stagger: 0.12,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: gridRef.current,
-              start: 'top 82%',
-            },
-          }
-        );
+        
+        if (isInitialMount.current) {
+          isInitialMount.current = false;
+          // Initial scroll trigger entrance
+          gsap.fromTo(
+            cards,
+            { y: 40, opacity: 0, scale: 0.97 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.6,
+              stagger: 0.08,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: gridRef.current,
+                start: 'top 88%',
+              },
+            }
+          );
+        } else {
+          // Instant snappy animation when switching category tabs
+          gsap.fromTo(
+            cards,
+            { y: 20, opacity: 0, scale: 0.97 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.35,
+              stagger: 0.05,
+              ease: 'power2.out',
+            }
+          );
+        }
       }
     }, sectionRef);
 

@@ -17,24 +17,27 @@ export default function SeasonGuideSection() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         cardRef.current,
-        { opacity: 0, scale: 0.96, y: 30 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.7, ease: 'power2.out' }
+        { opacity: 0, scale: 0.97, y: 15 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: 'power2.out' }
       );
     }, sectionRef);
 
     return () => ctx.revert();
   }, [activeSeasonId]);
 
-  const getSeasonIcon = (id) => {
+  const getSeasonIcon = (id, isActive) => {
+    const iconClass = `w-5 h-5 transition-colors duration-200 ${
+      isActive ? 'text-stone-950 font-bold' : 'text-amber-400 group-hover:text-white'
+    }`;
     switch (id) {
       case 'monsoon':
-        return <CloudRain className="w-5 h-5 text-amber-400" />;
+        return <CloudRain className={iconClass} />;
       case 'winter':
-        return <Snowflake className="w-5 h-5 text-amber-400" />;
+        return <Snowflake className={iconClass} />;
       case 'summer':
-        return <Sun className="w-5 h-5 text-amber-400" />;
+        return <Sun className={iconClass} />;
       default:
-        return <Sun className="w-5 h-5 text-amber-400" />;
+        return <Sun className={iconClass} />;
     }
   };
 
@@ -62,20 +65,23 @@ export default function SeasonGuideSection() {
 
           {/* Season Selector Tabs */}
           <div className="pt-6 flex flex-wrap justify-center gap-3">
-            {SEASON_GUIDE.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setActiveSeasonId(s.id)}
-                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 border ${
-                  activeSeasonId === s.id
-                    ? 'bg-amber-400 text-stone-950 border-amber-400 shadow-xl shadow-amber-400/20 scale-105'
-                    : 'bg-stone-900/80 text-stone-300 border-white/10 hover:border-amber-400/50 hover:text-white'
-                }`}
-              >
-                {getSeasonIcon(s.id)}
-                <span>{s.season}</span>
-              </button>
-            ))}
+            {SEASON_GUIDE.map((s) => {
+              const isActive = activeSeasonId === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setActiveSeasonId(s.id)}
+                  className={`group flex items-center gap-2.5 px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 border ${
+                    isActive
+                      ? 'bg-amber-400 text-stone-950 border-amber-400 shadow-xl shadow-amber-400/20 scale-105'
+                      : 'bg-stone-900/80 text-stone-300 border-white/10 hover:border-amber-400/50 hover:text-white'
+                  }`}
+                >
+                  {getSeasonIcon(s.id, isActive)}
+                  <span>{s.season}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 

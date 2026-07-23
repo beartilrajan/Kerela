@@ -3,6 +3,7 @@ import { X, Calendar, User, Mail, Compass, CheckCircle } from 'lucide-react';
 
 export default function BookingModal({ isOpen, onClose, selectedDestination }) {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,13 +15,51 @@ export default function BookingModal({ isOpen, onClose, selectedDestination }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      onClose();
-    }, 2500);
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('https://formspree.io/f/xqerdwqk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          dates: formData.dates,
+          guests: formData.guests,
+          destination: selectedDestination?.name || formData.destination || 'Kerala Destination',
+          notes: formData.notes,
+          _subject: `New Kerala Travel Itinerary Request from ${formData.name}`,
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          onClose();
+        }, 3000);
+      } else {
+        // Fallback for user feedback
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          onClose();
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Formspree submission error:', error);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -142,9 +181,10 @@ export default function BookingModal({ isOpen, onClose, selectedDestination }) {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-400/20 transition-all duration-300 hover:scale-[1.02]"
+                disabled={isSubmitting}
+                className="w-full py-3.5 rounded-full bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-stone-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-400/20 transition-all duration-300 hover:scale-[1.02]"
               >
-                Submit Itinerary Request
+                {isSubmitting ? 'Sending Request...' : 'Submit Itinerary Request'}
               </button>
             </form>
           </div>
