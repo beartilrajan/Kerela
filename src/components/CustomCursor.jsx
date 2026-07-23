@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CustomCursor() {
+  const [isMobile, setIsMobile] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
   const [isHovered, setIsHovered] = useState(false);
   const [trails, setTrails] = useState([]);
@@ -9,6 +10,21 @@ export default function CustomCursor() {
   const prevPos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    const checkMobile = () => {
+      // Hide cursor on touch devices or screens smaller than 768px (mobile view)
+      const isTouch = window.matchMedia('(pointer: coarse)').matches;
+      const isSmallScreen = window.innerWidth < 768;
+      setIsMobile(isTouch || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
+
     const handleMouseMove = (e) => {
       const { clientX: x, clientY: y } = e;
       const deltaX = x - prevPos.current.x;
@@ -66,18 +82,21 @@ export default function CustomCursor() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('click', handleClick);
     };
-  }, []);
+  }, [isMobile]);
 
   // Clean up trail particles
   useEffect(() => {
+    if (isMobile) return;
     const timer = setInterval(() => {
       setTrails((prev) => (prev.length > 0 ? prev.slice(1) : []));
     }, 50);
     return () => clearInterval(timer);
-  }, []);
+  }, [isMobile]);
+
+  if (isMobile) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden select-none">
+    <div className="hidden md:block pointer-events-none fixed inset-0 z-[9999] overflow-hidden select-none">
       {/* Particles Starting Centered at Mouse Pointer Position (x, y) */}
       {trails.map((t) => (
         <motion.div
